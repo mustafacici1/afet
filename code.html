@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZenGuard Tactical Home Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "alert": "#ff4d4d",
+                        "warning": "#ff9800",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0f1d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(25, 34, 51, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .tactical-glow {
+            box-shadow: 0 0 15px rgba(19, 91, 236, 0.4);
+        }
+        .pulse-red {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.2); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white selection:bg-primary/30">
+<div class="relative mx-auto min-h-screen max-w-[430px] overflow-hidden bg-background-light dark:bg-background-dark flex flex-col pb-24">
+<!-- TopAppBar - Status Center -->
+<header class="sticky top-0 z-50 px-6 pt-12 pb-4 backdrop-blur-md bg-background-dark/80">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+<h2 class="text-sm font-bold uppercase tracking-widest text-white/90">Zone: Safe</h2>
+</div>
+<p class="text-xs text-white/50">San Francisco, CA</p>
+</div>
+</div>
+<div class="flex h-10 w-10 items-center justify-center rounded-xl glass-card">
+<span class="material-symbols-outlined text-warning">cloud_sync</span>
+</div>
+</div>
+</header>
+<main class="flex-1 px-6 space-y-6 overflow-y-auto">
+<!-- Hero Tactical Toggles -->
+<section class="grid grid-cols-2 gap-4 pt-2">
+<button class="flex flex-col items-center justify-center gap-3 rounded-2xl glass-card p-6 border-primary/30 tactical-glow transition-all active:scale-95">
+<div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 text-primary border border-primary/40">
+<span class="material-symbols-outlined text-3xl">flashlight_on</span>
+</div>
+<span class="text-sm font-bold tracking-wide uppercase">Flashlight</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-3 rounded-2xl glass-card p-6 transition-all active:scale-95">
+<div class="flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-white/80 border border-white/10">
+<span class="material-symbols-outlined text-3xl">campaign</span>
+</div>
+<span class="text-sm font-bold tracking-wide uppercase">Whistle</span>
+</button>
+</section>
+<!-- Bento Grid Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between px-1">
+<h3 class="text-lg font-bold tracking-tight">Tactical Dashboard</h3>
+<span class="text-[10px] uppercase font-semibold text-white/30 tracking-tighter">Live Telemetry</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Earthquake Alerts (2x2 style span) -->
+<div class="col-span-2 glass-card rounded-2xl p-5 relative overflow-hidden">
+<div class="absolute top-4 right-4 flex items-center gap-2">
+<span class="pulse-red h-2 w-2 rounded-full bg-alert"></span>
+<span class="text-[10px] font-bold text-alert uppercase">Live</span>
+</div>
+<div class="flex flex-col gap-4">
+<div>
+<h4 class="text-base font-bold">Earthquake Alerts</h4>
+<p class="text-xs text-white/50">Seismic activity monitored in real-time</p>
+</div>
+<div class="h-24 w-full bg-primary/5 rounded-lg border border-white/5 flex items-end justify-between px-2 pb-2 gap-1 overflow-hidden">
+<!-- Mock Waveform -->
+<div class="w-2 bg-primary/20 rounded-t-sm h-1/4"></div>
+<div class="w-2 bg-primary/30 rounded-t-sm h-2/4"></div>
+<div class="w-2 bg-primary/40 rounded-t-sm h-1/3"></div>
+<div class="w-2 bg-primary/60 rounded-t-sm h-3/4"></div>
+<div class="w-2 bg-alert/60 rounded-t-sm h-5/6 pulse-red"></div>
+<div class="w-2 bg-primary/40 rounded-t-sm h-1/2"></div>
+<div class="w-2 bg-primary/20 rounded-t-sm h-1/4"></div>
+<div class="w-2 bg-primary/10 rounded-t-sm h-1/6"></div>
+<div class="w-2 bg-primary/40 rounded-t-sm h-2/5"></div>
+<div class="w-2 bg-primary/20 rounded-t-sm h-1/3"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium text-white/70">Mag: 2.1 <span class="text-white/30 ml-2">4km Away</span></span>
+<button class="rounded-lg bg-primary px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">Details</button>
+</div>
+</div>
+</div>
+<!-- Safety Network -->
+<div class="glass-card rounded-2xl p-4 flex flex-col justify-between aspect-square">
+<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div>
+<h4 class="text-sm font-bold">Safety Network</h4>
+<p class="text-[10px] text-green-400 font-medium mt-1">4 Contacts Safe</p>
+</div>
+</div>
+<!-- Community Forum -->
+<div class="glass-card rounded-2xl p-4 flex flex-col justify-between aspect-square">
+<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<div>
+<h4 class="text-sm font-bold">Community</h4>
+<p class="text-[10px] text-white/50 mt-1">12 Local Updates</p>
+</div>
+</div>
+<!-- Damage Report (Wide) -->
+<button class="col-span-2 glass-card rounded-2xl p-5 flex items-center justify-between border-alert/20 hover:border-alert/40 transition-colors group">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-alert/10 text-alert group-hover:bg-alert/20">
+<span class="material-symbols-outlined">report_problem</span>
+</div>
+<div class="text-left">
+<h4 class="text-base font-bold">Damage Report</h4>
+<p class="text-xs text-white/50">Submit urgent incident details</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-white/30">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Quick Access Section -->
+<section class="pb-10">
+<div class="rounded-2xl bg-gradient-to-r from-primary/20 to-transparent p-[1px]">
+<div class="bg-background-dark/40 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-center bg-cover border border-white/10" data-alt="Satellite map view of local area" data-location="San Francisco" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA7TTXSukUqyxaWkVGYsXFYKvisEY4SrPC172Z1BcYJReck1Tj9M5TXwYblofAs5ZFyjPKEMR2pNjUM_JtfEvy3Qc_rdWfI6Y97PJq_6iAKLSIK6bHYwV_KbID0UdkjA8t2cloPvRY-vbJ0TBFIqccX5N9h_6TjcDEygwBY2djAjGQ4c5_ev2GRpRcZohc5LD-VtHlPfCti447x3Vk3F5bkCnx7X70DYOkHHOCrnbuJ3y4fBCjcM33s5s1Hvc7hOV7BM3im1TBsEPyD');"></div>
+<div class="flex-1">
+<p class="text-xs font-bold uppercase text-primary/80">Active Route</p>
+<p class="text-sm font-medium">To: Emergency Shelter #4</p>
+</div>
+<span class="material-symbols-outlined text-white/20">near_me</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Bottom Navigation -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[380px] z-[100]">
+<div class="glass-card rounded-3xl px-6 py-4 flex items-center justify-between shadow-2xl shadow-black/50 border-white/5">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-2xl font-variation-fill">home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl">map</span>
+</button>
+<button class="flex flex-col items-center justify-center -mt-10 h-16 w-16 rounded-full bg-alert text-white shadow-[0_8px_20px_rgba(255,77,77,0.4)] border-4 border-background-dark active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl font-bold">sos</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl">shield_with_heart</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl">person</span>
+</button>
+</div>
+</nav>
+</div>
+</body></html>
