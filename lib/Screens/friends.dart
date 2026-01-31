@@ -2,11 +2,8 @@ import 'package:afet/Screens/chat_screen.dart';
 import 'package:afet/Screens/friends_map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:async'; // Timer ve Stream işlemleri için şart
+import 'dart:async';
 
-// Not: Bu dosyada RealtimeChannel kullanıyorsanız onPostgresChanges metodunu kullanın.
-// Hata aldığınız satırları (on, RealtimeListenTypes, ChannelFilter)
-// yukarıdaki Map örneğindeki gibi onPostgresChanges ile güncelleyin.
 final supabase = Supabase.instance.client;
 
 class FriendsScreen extends StatefulWidget {
@@ -18,7 +15,7 @@ class FriendsScreen extends StatefulWidget {
 
 class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateMixin {
   late final TabController _tabController;
-  
+
   Future<List<Map<String, dynamic>>>? _friendsFuture;
   Future<List<Map<String, dynamic>>>? _requestsFuture;
 
@@ -49,13 +46,13 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
   Future<void> _initializeAndFetch() async {
     final authId = supabase.auth.currentUser?.id;
     if (authId == null) return;
-    
+
     try {
       final profileResponse = await supabase.from('profiles').select('id').eq('auth_uid', authId).single();
       if (mounted) {
         _currentProfileId = profileResponse['id'];
         _refreshData();
-        
+
         _statusChannel = supabase.channel('public:user_status');
         _statusChannel!.onPostgresChanges(
           event: PostgresChangeEvent.all,
@@ -79,8 +76,6 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
     });
   }
 
-  // --- DATA METHODS ---
-
   Future<List<Map<String, dynamic>>> _getFriends() async {
     if (_currentProfileId == null) return [];
     try {
@@ -92,27 +87,26 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
     }
   }
 
-  // Client-side fallback if the RPC function doesn't exist
   Future<List<Map<String, dynamic>>> _getFriendsClientSide() async {
-      if (_currentProfileId == null) return [];
-      final response = await supabase
-          .from('friendships')
-          .select('requester_id, receiver_id')
-          .or('requester_id.eq.$_currentProfileId,receiver_id.eq.$_currentProfileId')
-          .eq('status', 'accepted');
-      if (response.isEmpty) return [];
-      final friendProfileIds = response.map((f) =>
-          f['requester_id'] == _currentProfileId ? f['receiver_id'] : f['requester_id']
-      ).toList();
-      if (friendProfileIds.isEmpty) return [];
+    if (_currentProfileId == null) return [];
+    final response = await supabase
+        .from('friendships')
+        .select('requester_id, receiver_id')
+        .or('requester_id.eq.$_currentProfileId,receiver_id.eq.$_currentProfileId')
+        .eq('status', 'accepted');
+    if (response.isEmpty) return [];
+    final friendProfileIds = response.map((f) =>
+    f['requester_id'] == _currentProfileId ? f['receiver_id'] : f['requester_id']
+    ).toList();
+    if (friendProfileIds.isEmpty) return [];
 
-      final profiles = await supabase.from('profiles').select('id, full_name, photo_url').filter('id', 'in', '(${friendProfileIds.map((id) => '"$id"').join(',')})');
-      final statusResponse = await supabase.from('user_status').select('user_id, status').filter('user_id', 'in', '(${friendProfileIds.map((id) => '"$id"').join(',')})');
-      
-      return profiles.map((profile) {
-        final status = statusResponse.firstWhere((s) => s['user_id'] == profile['id'], orElse: () => <String, dynamic>{'status': 'bilinmiyor'});
-        return {...profile, ...status};
-      }).toList();
+    final profiles = await supabase.from('profiles').select('id, full_name, photo_url').filter('id', 'in', '(${friendProfileIds.map((id) => '"$id"').join(',')})');
+    final statusResponse = await supabase.from('user_status').select('user_id, status').filter('user_id', 'in', '(${friendProfileIds.map((id) => '"$id"').join(',')})');
+
+    return profiles.map((profile) {
+      final status = statusResponse.firstWhere((s) => s['user_id'] == profile['id'], orElse: () => <String, dynamic>{'status': 'bilinmiyor'});
+      return {...profile, ...status};
+    }).toList();
   }
 
   Future<List<Map<String, dynamic>>> _getFriendRequests() async {
@@ -160,7 +154,6 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
       results = List<Map<String, dynamic>>.from(response);
     } catch (e) {
       debugPrint("Search RPC Error: $e");
-      // Keep results as empty list in case of error
     } finally {
       if (mounted) {
         setState(() {
@@ -232,7 +225,7 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
       ),
     );
   }
-  
+
   Widget _buildFriendsList() {
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _friendsFuture,
@@ -245,7 +238,7 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
       },
     );
   }
-  
+
   Widget _buildRequestsList() {
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _requestsFuture,
@@ -281,8 +274,8 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
         if (_isSearching) const LinearProgressIndicator(backgroundColor: Colors.transparent, color: Color(0xFF135BEC)),
         Expanded(
           child: _searchResults.isEmpty
-                  ? _buildEmptyState(Icons.search, _searchController.text.isEmpty ? 'Kişi bulmak için yazmaya başla.' : 'Aramanızla eşleşen kimse bulunamadı.')
-                  : _buildUserListView(_searchResults, 'search'),
+              ? _buildEmptyState(Icons.search, _searchController.text.isEmpty ? 'Kişi bulmak için yazmaya başla.' : 'Aramanızla eşleşen kimse bulunamadı.')
+              : _buildUserListView(_searchResults, 'search'),
         ),
       ],
     );
@@ -295,48 +288,81 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
       itemBuilder: (context, index) {
         final user = users[index];
         final profile = (type == 'request' ? user['profiles'] : user) as Map<String, dynamic>;
-        Widget trailing;
+        Widget? trailing;
+
+        final profileId = profile['id'] as String?;
+
         switch (type) {
           case 'friend':
-            trailing = Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.message, color: Colors.white54),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          friendId: profile['id'],
-                          friendName: profile['full_name'] ?? 'İsimsiz',
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                IconButton(icon: const Icon(Icons.more_vert, color: Colors.white54), onPressed: () => _showFriendOptions(profile)),
-              ],
+            trailing = SizedBox(
+              width: 96, // Sabit genişlik
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (profileId != null)
+                    IconButton(
+                      icon: const Icon(Icons.message, color: Colors.white54, size: 20),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              friendId: profileId,
+                              friendName: profile['full_name'] ?? 'İsimsiz',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.more_vert, color: Colors.white54, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => _showFriendOptions(profile),
+                  ),
+                ],
+              ),
             );
             break;
           case 'request':
-            trailing = Row(mainAxisSize: MainAxisSize.min, children: [
-              IconButton(icon: const Icon(Icons.check_circle, color: Colors.greenAccent), onPressed: () => _updateFriendshipStatus(user['id'], 'accepted')),
-              IconButton(icon: const Icon(Icons.cancel, color: Colors.redAccent), onPressed: () => _updateFriendshipStatus(user['id'], 'declined')),
-            ]);
+            trailing = SizedBox(
+              width: 96, // Sabit genişlik
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => _updateFriendshipStatus(user['id'], 'accepted'),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.cancel, color: Colors.redAccent, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => _updateFriendshipStatus(user['id'], 'declined'),
+                  ),
+                ],
+              ),
+            );
             break;
           case 'search':
-            trailing = _buildFriendshipButton(profile['friendship_status'] as String? ?? 'none', profile['id']);
+            if (profileId != null) {
+              trailing = _buildFriendshipButton(profile['friendship_status'] as String? ?? 'none', profileId);
+            }
             break;
-          default:
-            trailing = const SizedBox.shrink();
         }
-        
+
         final status = (profile['status'] as String?) ?? 'bilinmiyor';
         final isSafe = status == 'safe';
         final color = isSafe ? Colors.greenAccent : (status == 'unsafe' ? Colors.orangeAccent : Colors.redAccent);
 
         return Card(
+          margin: const EdgeInsets.only(bottom: 8),
           elevation: 4,
           shadowColor: Colors.black.withOpacity(0.4),
           shape: RoundedRectangleBorder(
@@ -367,18 +393,49 @@ class _FriendsScreenState extends State<FriendsScreen> with TickerProviderStateM
       },
     );
   }
-  
+
   Widget _buildFriendshipButton(String status, String userId) {
     switch (status) {
       case 'accepted':
-        return ElevatedButton(onPressed: null, style: ElevatedButton.styleFrom(backgroundColor: Colors.green), child: const Text('Arkadaş'));
+        return SizedBox(
+          width: 90,
+          height: 36,
+          child: ElevatedButton(
+            onPressed: null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            child: const Text('Arkadaş', style: TextStyle(fontSize: 12)),
+          ),
+        );
       case 'pending':
-        return ElevatedButton(onPressed: null, style: ElevatedButton.styleFrom(backgroundColor: Colors.grey), child: const Text('İstek Gönderildi'));
+        return SizedBox(
+          width: 110,
+          height: 36,
+          child: ElevatedButton(
+            onPressed: null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            child: const Text('Gönderildi', style: TextStyle(fontSize: 12)),
+          ),
+        );
       default:
-        return ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF135BEC), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-          onPressed: () => _sendFriendRequest(userId),
-          child: const Text('Ekle'),
+        return SizedBox(
+          width: 70,
+          height: 36,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF135BEC),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            onPressed: () => _sendFriendRequest(userId),
+            child: const Text('Ekle', style: TextStyle(fontSize: 12)),
+          ),
         );
     }
   }

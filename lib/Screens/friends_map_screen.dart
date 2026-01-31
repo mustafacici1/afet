@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:afet/Screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -75,7 +76,7 @@ class _FriendsMapScreenState extends State<FriendsMapScreen> {
           .from('user_status')
           .select('user_id, status, location, profiles(full_name)')
           .filter('user_id', 'in', '(${_friendIds.join(',')})');
-
+      
       final List<Marker> markers = [];
       for (final status in friendStatuses) {
         final marker = _createMarkerFromStatus(status);
@@ -155,14 +156,41 @@ class _FriendsMapScreenState extends State<FriendsMapScreen> {
     return Marker(
       key: Key(friendId),
       point: LatLng(latitude, longitude),
-      width: 80,
-      height: 80,
-      child: Tooltip(
-        message: '$friendName ($friendStatus)',
-        child: Icon(
-          Icons.location_pin,
-          color: _getMarkerColor(friendStatus),
-          size: 40,
+      width: 45,
+      height: 45,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                friendId: friendId,
+                friendName: friendName,
+              ),
+            ),
+          );
+        },
+        child: Tooltip(
+          message: '$friendName ($friendStatus)',
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _getMarkerColor(friendStatus).withOpacity(0.8),
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                )
+              ]
+            ),
+            child: Icon(
+              _getMarkerIconData(friendStatus),
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
         ),
       ),
     );
@@ -171,13 +199,26 @@ class _FriendsMapScreenState extends State<FriendsMapScreen> {
   Color _getMarkerColor(String status) {
     switch (status) {
       case 'safe':
-        return Colors.green;
+        return Colors.green.shade600;
       case 'unsafe':
-        return Colors.orange;
+        return Colors.orange.shade700;
       case 'enkazda':
-        return Colors.red;
+        return Colors.red.shade700;
       default:
-        return Colors.purple;
+        return Colors.purple.shade600;
+    }
+  }
+
+  IconData _getMarkerIconData(String status) {
+    switch (status) {
+      case 'safe':
+        return Icons.check;
+      case 'unsafe':
+        return Icons.warning_amber_rounded;
+      case 'enkazda':
+        return Icons.dangerous_outlined;
+      default:
+        return Icons.person_pin;
     }
   }
 

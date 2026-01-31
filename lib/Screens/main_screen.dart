@@ -1172,7 +1172,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildNavIcon(Icons.home, 0),
-            _buildNavIcon(Icons.map, 1),
+            _buildNavIcon(Icons.forum, 3), // Replaced map with forum
             _buildSOSButton(),
             _buildNavIcon(Icons.shield_outlined, 2),
             _buildNavIcon(Icons.person, 5),
