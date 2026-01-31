@@ -425,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               const Color(0xFFFF4D4D),
               'Kritik durum - Acil SOS sinyali gönder',
               () {
-                _updateUserStatus('critical');
+                _updateUserStatus('enkazda');
                 _createAidRequest('Enkaz Altında');
                 Navigator.pop(context);
               },
